@@ -7,7 +7,6 @@ from dotenv import load_dotenv, find_dotenv
 #Se lee del archivo .env la api key de openai
 _ = load_dotenv('openAI.env')
 client = OpenAI(
-    # This is the default and can be omitted
     api_key=os.environ.get('openAI_api_key'),
 )
 
