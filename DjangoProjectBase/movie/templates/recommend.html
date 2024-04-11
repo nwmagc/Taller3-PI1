@@ -1,0 +1,40 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<div class="container"> 
+    <!-- Formulario de búsqueda -->
+    <form action=""> 
+        <!-- Campo de búsqueda -->
+        <div class="mb-3"> 
+            <label for="searchMovie" class="form-label">Search for Movie:</label>
+            <input type="text" class="form-control" name="searchMovie"/>
+        </div>
+        <!-- Botón de búsqueda -->
+        <button type="submit" class="btn btn-primary">Recomendar</button>
+    </form>   
+
+    <!-- Mostrar término de búsqueda -->
+    <p>Recomendando: {{ searchTerm }}</p> 
+
+    <!-- Mostrar película recomendada -->
+    <div class="row row-cols-1 row-cols-md-3 g-4"> 
+        <div class="col">
+            <div class="card">
+                <img src="{{ movie.image.url }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                <h5 class="card-title fw-bold">{{ movie.title}}</h5>
+                <p class="card-text">{{ movie.description}}</p>
+                <p class="card-text">{{ movie.genre}}</p>
+                <p class="card-text">{{ movie.year}}</p>
+                {% if movie.url %}
+                     <a href="{{ movie.url }}" class="btn btn-primary">Movie Link</a>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>    
+
+</div>
+
+
+{% endblock content %}

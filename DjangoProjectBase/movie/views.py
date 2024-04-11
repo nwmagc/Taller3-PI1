@@ -8,6 +8,23 @@ import matplotlib
 import io
 import urllib, base64
 
+from dotenv import load_dotenv, find_dotenv
+import json
+import os
+from openai import OpenAI
+import numpy as np
+
+_ = load_dotenv('../openAI.env')
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get('openAI_api_key'),
+)
+
+with open('../movie_descriptions_embeddings.json', 'r') as file:
+    file_content = file.read()
+    movies = json.loads(file_content)
+
+
 def home(request):
     #return HttpResponse('<h1>Welcome to Home Page</h1>')
     #return render(request, 'home.html')
@@ -123,3 +140,37 @@ def generate_bar_chart(data, xlabel, ylabel):
     buffer.close()
     graphic = base64.b64encode(image_png).decode('utf-8')
     return graphic
+
+def get_embedding(text, model="text-embedding-3-small"):
+   text = text.replace("\n", " ")
+   return client.embeddings.create(input = [text], model=model).data[0].embedding
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def recommend_movie(request):
+    searchTerm = request.GET.get('searchMovie')
+    rec_movie = None
+
+    if searchTerm:
+        req = str(searchTerm)
+        emb = get_embedding(req)
+
+        sim = []
+        for movie in movies:
+            emb_binary = movie['embedding']
+            sim.append(cosine_similarity(emb_binary, emb))
+
+        sim = np.array(sim)
+        idx = np.argmax(sim)
+        max_similarity = sim[idx]
+        rec_movie = movies[idx]
+        print(f"Prompt: {req}")
+        print(f"Embedding: {emb}")
+        print(f"Max similarity: {max_similarity}")
+        print(f"Recommended movie: {rec_movie}")
+
+    return render(request, 'recommend.html', {'searchTerm': searchTerm, 'movie': rec_movie})
+    
+
